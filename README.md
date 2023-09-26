@@ -42,7 +42,19 @@ If you want to convert the Python script to an executable (.exe) file for easier
 
 - For cx_Freeze, you'll need to create a setup script. Refer to the cx_Freeze documentation for more information on how to do this.
 
-3. **Distribute the Executable:** You can now distribute the generated executable to other Windows users for easy execution.
+3. **Run the Script:**
+Exchange the {adress} with your xmr adress
+
+- The Executable
+  ```
+  ./MYEXE {adress}
+  ```
+- The Script
+  ```
+  python main.py {adress}
+  ```
+
+4. **Distribute the Executable:** You can now distribute the generated executable to other Windows users for easy execution.
 
 ## Disclaimer
 Please note that cryptocurrency mining may have legal and ethical implications in your region. Ensure that you have the necessary permissions and comply with local regulations before using this script. Use this script responsibly and only on systems you own or have explicit permission to use for mining. ;)
