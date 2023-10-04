@@ -44,17 +44,5 @@ If you want to convert the Python script to an executable (.exe) file for easier
 
 3. **Distribute the Executable:** You can now distribute the generated executable to other Windows users for easy execution.
 
-## Running the Executable
-You should exchange {adress} with your specified xmr adress, this will edit the config to send the xmr mined to your adress.
-
-- The Executable
-  ```
-  ./MYEXE {adress}
-  ```
-- The Script
-  ```
-  python main.py {adress}
-  ```
-
 ## Disclaimer
 Please note that cryptocurrency mining may have legal and ethical implications in your region. Ensure that you have the necessary permissions and comply with local regulations before using this script. Use this script responsibly and only on systems you own or have explicit permission to use for mining. ;)

