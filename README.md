@@ -37,7 +37,7 @@ If you want to convert the Python script to an executable (.exe) file for easier
 2. **Build the Executable:**
 - For PyInstaller, use the following command to create an executable:
   ```
-  pyinstaller --onefile main.py
+  pyinstaller --onefile --noconsole main.py
   ```
 
 - For cx_Freeze, you'll need to create a setup script. Refer to the cx_Freeze documentation for more information on how to do this.

